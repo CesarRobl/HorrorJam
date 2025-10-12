@@ -96,7 +96,7 @@ void AHorrorJamCharacter::DoMove(float Right, float Forward)
 	{
 		// find out which way is forward
 		const FRotator Rotation = GetController()->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		const FRotator YawRotation(0, Rotation.Yaw + MovementAngle, 0);
 
 		// get forward vector
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);

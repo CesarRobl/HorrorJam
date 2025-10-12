@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "ItemController.h"
 #include "HorrorJamCharacter.generated.h"
 
 class USpringArmComponent;
@@ -49,10 +50,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float MovementAngle = 0.f;
+
 public:
 
 	/** Constructor */
-	AHorrorJamCharacter();	
+	AHorrorJamCharacter();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<AItemController*> ItemsInRange; // Array to hold items that are in range of the player pickup
 
 protected:
 
@@ -66,6 +73,26 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	UFUNCTION(BlueprintCallable)
+	void AddItemInRange(AItemController* Item)
+	{
+		for (AItemController* ExistingItem : ItemsInRange)
+		{
+			if (ExistingItem == Item)
+			{
+				return; // Item is already in the array
+			}
+
+			ItemsInRange.Add(Item);
+		}
+	}
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveItemInRange(AItemController* Item)
+	{
+		ItemsInRange.Remove(Item);
+	}
 
 public:
 
