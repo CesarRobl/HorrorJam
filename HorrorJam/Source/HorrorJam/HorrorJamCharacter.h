@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
-#include "ItemController.h"
+#include  "Public/Item.h"
 #include "HorrorJamCharacter.generated.h"
 
 class USpringArmComponent;
@@ -32,6 +32,8 @@ class AHorrorJamCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
 	
+	
+
 protected:
 
 	/** Jump Input Action */
@@ -53,13 +55,20 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float MovementAngle = 0.f;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TArray<AItem*> ItemsInRange;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int32 ItemIndex = 0;
+
+	AItem* CarriedItem = nullptr;
+
+
 public:
 
 	/** Constructor */
 	AHorrorJamCharacter();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<AItemController*> ItemsInRange; // Array to hold items that are in range of the player pickup
 
 protected:
 
@@ -74,24 +83,42 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
+	
 	UFUNCTION(BlueprintCallable)
-	void AddItemInRange(AItemController* Item)
+	void PickUpItem()
 	{
-		for (AItemController* ExistingItem : ItemsInRange)
-		{
-			if (ExistingItem == Item)
-			{
-				return; // Item is already in the array
-			}
+		if (ItemsInRange.Num() <= 0)
+			return;
 
-			ItemsInRange.Add(Item);
+		AItem* Item = ItemsInRange[ItemIndex];
+
+		CarriedItem = Item;
+		
+		if (GetMesh()->DoesSocketExist(FName("ItemSocket"))) {
+
+			Item->ItemMesh->SetSimulatePhysics(false);
+			Item->SetActorEnableCollision(false);
+
+			Item->AttachToComponent(GetMesh(), 
+				FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("ItemSocket"));	
 		}
 	}
 
-	UFUNCTION(BlueprintCallable)
-	void RemoveItemInRange(AItemController* Item)
+	UFUNCTION(BlueprintCallable)	
+	void DropItem()
 	{
-		ItemsInRange.Remove(Item);
+		if (CarriedItem == nullptr)
+			return;
+		CarriedItem->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		CarriedItem->ItemMesh->SetSimulatePhysics(true);
+		CarriedItem->SetActorEnableCollision(true);
+		CarriedItem = nullptr;
+	}
+
+	UFUNCTION(BlueprintCallable)
+	bool IsCarryingItem() const
+	{
+		return CarriedItem != nullptr;
 	}
 
 public:
