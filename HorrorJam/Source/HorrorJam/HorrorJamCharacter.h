@@ -62,9 +62,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	int32 ItemIndex = 0;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	AItem* CarriedItem = nullptr;
-
+	
 
 public:
 
@@ -77,6 +75,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	ABasket* PlayerBasket = nullptr;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	AItem* CarriedItem = nullptr;
 
 
 

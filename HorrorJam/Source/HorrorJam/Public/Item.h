@@ -24,6 +24,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool IsBasket = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString ItemName;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	int32 ItemWeight = 1;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
