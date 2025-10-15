@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include  "Public/Item.h"
+#include "Public/Basket.h"
 #include "HorrorJamCharacter.generated.h"
 
 class USpringArmComponent;
@@ -61,6 +62,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	int32 ItemIndex = 0;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AItem* CarriedItem = nullptr;
 
 
@@ -69,11 +71,22 @@ public:
 	/** Constructor */
 	AHorrorJamCharacter();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bIsNearBasket = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	ABasket* PlayerBasket = nullptr;
+
+
+
+
 
 protected:
 
 	/** Initialize input action bindings */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void BeginPlay() override;
 
 protected:
 
@@ -90,29 +103,71 @@ protected:
 		if (ItemsInRange.Num() <= 0)
 			return;
 
-		AItem* Item = ItemsInRange[ItemIndex];
+		AItem* Item = GetClosestItem();
 
-		CarriedItem = Item;
 		
+		AttachItem(Item);
+	}
+
+	UFUNCTION(BlueprintCallable)
+	void AttachItem(AItem* Item)
+	{
 		if (GetMesh()->DoesSocketExist(FName("ItemSocket"))) {
+			CarriedItem = Item;
 
-			Item->ItemMesh->SetSimulatePhysics(false);
-			Item->SetActorEnableCollision(false);
-
-			Item->AttachToComponent(GetMesh(), 
-				FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("ItemSocket"));	
+			Item->TurnOffCollision();
+			Item->AttachToComponent(GetMesh(),
+				FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("ItemSocket"));
 		}
 	}
 
 	UFUNCTION(BlueprintCallable)	
 	void DropItem()
 	{
-		if (CarriedItem == nullptr)
-			return;
 		CarriedItem->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+		// If player is near basket and is carrying an item, add item to basket
+		if (bIsNearBasket)
+		{
+			PlayerBasket->AddItem(CarriedItem);
+
+			CarriedItem = nullptr;
+			return;
+		}
+
+		
 		CarriedItem->ItemMesh->SetSimulatePhysics(true);
 		CarriedItem->SetActorEnableCollision(true);
 		CarriedItem = nullptr;
+	}
+
+	UFUNCTION(BlueprintCallable)
+	AItem* GetClosestItem() const
+	{
+		if (ItemsInRange.Num() <= 0)
+			return nullptr;
+			
+		FVector PlayerLocation = GetActorLocation();
+		float ClosestDist = TNumericLimits<float>::Max();
+		AItem* ClosestItem = nullptr;
+
+		for (AItem* Item : ItemsInRange)
+		{
+			float Dist = FVector::Dist(PlayerLocation, Item->GetActorLocation());
+			if (Dist < ClosestDist)
+			{
+				ClosestDist = Dist;
+				ClosestItem = Item;
+			}
+		}
+
+		return ClosestItem;
+	}
+	
+	UFUNCTION(BlueprintCallable)
+	bool ItemIsNear() const
+	{
+		return ItemsInRange.Num() > 0;
 	}
 
 	UFUNCTION(BlueprintCallable)
@@ -120,6 +175,8 @@ protected:
 	{
 		return CarriedItem != nullptr;
 	}
+
+
 
 public:
 

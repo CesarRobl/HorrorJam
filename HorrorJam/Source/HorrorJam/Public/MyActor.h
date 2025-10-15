@@ -4,40 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Item.generated.h"
+#include "MyActor.generated.h"
 
 UCLASS()
-class HORRORJAM_API AItem : public AActor
+class HORRORJAM_API AMyActor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AItem();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UStaticMeshComponent* ItemMesh;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bIsKeyItem = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool IsBasket = false;
+	AMyActor();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	void TurnOffCollision()
-	{
-		ItemMesh->SetSimulatePhysics(false);
-		SetActorEnableCollision(false);
-	}
 
 };

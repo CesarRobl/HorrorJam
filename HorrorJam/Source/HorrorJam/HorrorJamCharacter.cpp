@@ -9,6 +9,7 @@
 #include "GameFramework/Controller.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Public/Basket.h"
 #include "InputActionValue.h"
 #include "HorrorJam.h"
 
@@ -48,6 +49,15 @@ AHorrorJamCharacter::AHorrorJamCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+}
+
+void AHorrorJamCharacter::BeginPlay()
+{
+	// Call the base class  
+	Super::BeginPlay();
+	
+	// Spawn in basket and attach to player
+	
 }
 
 void AHorrorJamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
