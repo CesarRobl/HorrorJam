@@ -24,12 +24,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UPuzzleRule* PuzzleRule;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TArray<APuzzleSignal*> PuzzleSignals;
-
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<APuzzleSignal*> PuzzleSignals;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FName PuzzleID;
+
+
 
 	UFUNCTION(BlueprintCallable)
 	void CheckPuzzleCompletion()

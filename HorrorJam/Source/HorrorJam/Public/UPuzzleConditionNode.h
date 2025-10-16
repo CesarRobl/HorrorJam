@@ -16,7 +16,12 @@ class HORRORJAM_API UUPuzzleConditionNode : public UDataAsset
 	
 	public:
 
+		UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		FName ManagerID;
+
 		UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Puzzle Condition")
 		bool EvaluateCondition(const UObject* Context) const;
 		virtual bool EvaluateCondition_Implementation(const UObject* Context) const {return false; }
+
+	
 };

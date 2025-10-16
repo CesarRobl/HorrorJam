@@ -7,6 +7,7 @@
 #include "Logging/LogMacros.h"
 #include  "Public/Item.h"
 #include "Public/Basket.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "HorrorJamCharacter.generated.h"
 
 class USpringArmComponent;
@@ -73,10 +74,19 @@ public:
 	bool bIsNearBasket = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bIsPushing = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	ABasket* PlayerBasket = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AItem* CarriedItem = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	AItem* ItemToPush = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float ForwardValue = 0.f;
 
 
 
@@ -104,8 +114,9 @@ protected:
 			return;
 
 		AItem* Item = GetClosestItem();
+		if (Item->bIsLargeItem)
+			return;
 
-		
 		AttachItem(Item);
 	}
 
@@ -139,6 +150,26 @@ protected:
 		CarriedItem->ItemMesh->SetSimulatePhysics(true);
 		CarriedItem->SetActorEnableCollision(true);
 		CarriedItem = nullptr;
+	}	
+
+	UFUNCTION(BlueprintCallable)
+	void PushItem()
+	{
+		if (!bIsPushing || ItemToPush == nullptr)
+			return;
+
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+
+		if (ForwardValue == 0)
+			return;
+		
+		if(ForwardValue > 0.1f)
+			ItemToPush->MoveItem(34.f, GetActorForwardVector());
+		else
+		{
+			ItemToPush->MoveItem(-34.f, GetActorForwardVector());
+		}
+
 	}
 
 	UFUNCTION(BlueprintCallable)

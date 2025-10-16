@@ -114,8 +114,14 @@ void AHorrorJamCharacter::DoMove(float Right, float Forward)
 		// get right vector 
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
+		ForwardValue = Forward;
+
 		// add movement 
 		AddMovementInput(ForwardDirection, Forward);
+
+		if (bIsPushing)
+			return;
+
 		AddMovementInput(RightDirection, Right);
 	}
 }

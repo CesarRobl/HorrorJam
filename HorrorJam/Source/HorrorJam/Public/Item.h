@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "Item.generated.h"
 
 UCLASS()
@@ -19,7 +20,13 @@ public:
 	UStaticMeshComponent* ItemMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPhysicsConstraintComponent* ItemConstraint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsKeyItem = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsLargeItem = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool IsBasket = false;
@@ -44,6 +51,16 @@ public:
 	{
 		ItemMesh->SetSimulatePhysics(false);
 		SetActorEnableCollision(false);
+	}
+
+	void MoveItem(float Speed, FVector PlayerForward)
+	{
+		FVector MovementDirection = PlayerForward * Speed;
+		FVector TargetLocation = ItemMesh->GetRelativeLocation() + MovementDirection;
+
+		FVector NewLocation = FMath::VInterpTo(ItemMesh->GetRelativeLocation(), TargetLocation, GetWorld()->GetDeltaSeconds(), 4);
+
+		ItemMesh->SetRelativeLocation(NewLocation);
 	}
 
 };
