@@ -21,7 +21,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FString RequiredItem;
 
-	 bool EvaluateCondition_Implementation(const UObject* Context) const override
+	 bool EvaluateCondition_Implementation(const UObject* Context, int Index) const override
 	{
 	
 
@@ -38,6 +38,8 @@ public:
 
 		 if (!Player)
 			 return false;
+
+		 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player is carrying: %s"), Player->CarriedItem ? *Player->CarriedItem->ItemName : TEXT("Nothing")));
 
 		 return Player->CarriedItem->ItemName == RequiredItem;
 	};

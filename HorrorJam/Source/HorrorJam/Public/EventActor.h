@@ -4,23 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Item.h"
-#include "PuzzleSignal.generated.h"
+#include "EventActor.generated.h"
 
 UCLASS()
-class HORRORJAM_API APuzzleSignal : public AActor
+class HORRORJAM_API AEventActor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	APuzzleSignal();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Weight = 1;
-
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	AItem* PedestalItem = nullptr;
+	AEventActor();
 
 protected:
 	// Called when the game starts or when spawned
@@ -29,5 +22,11 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void TriggerEvent();
+	void TriggerEvent_Implementation()
+	{
+	}
 
 };

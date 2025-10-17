@@ -16,6 +16,7 @@ class HORRORJAM_API ABasket : public AItem
 
 	public:
 		
+		UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		TArray<AItem*> Inventory;
 
 		UFUNCTION(BlueprintCallable)
@@ -67,9 +68,25 @@ class HORRORJAM_API ABasket : public AItem
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("Selected Item: %s"), *SelectedItem->GetName()));
 		}
 
+		UFUNCTION(BlueprintCallable)
+		int ReturnSelectedItemIndex() const
+		{
+			int ItemIndex = 0;
+
+			for (auto* Item : Inventory)
+			{
+				if (Item == ItemToTake)
+					break;
+				ItemIndex++;
+			}
+
+				return ItemIndex;
+		}
+
 
 	protected:
 		
+		UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 		int32 InventoryIndex = 0;
 
 		UPROPERTY(VisibleAnywhere, BlueprintReadWrite)

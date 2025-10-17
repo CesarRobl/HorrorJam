@@ -17,10 +17,14 @@ struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
-/**
- *  A simple player-controllable third person character
- *  Implements a controllable orbiting camera
- */
+UENUM(BlueprintType)
+enum class PushState : uint8
+{
+	NotPushing = 0,
+	Pushing = 1,
+	Pulling = 2
+};
+
 UCLASS(abstract)
 class AHorrorJamCharacter : public ACharacter
 {
@@ -54,8 +58,20 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Player Values")
 	float MovementAngle = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Values")
+	float PushSpeed = 34.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Values")
+	float WalkSpeed = 350.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Values")
+	float RunSpeed = 500.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Values")
+	float PushWalkSpeed = 135.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<AItem*> ItemsInRange;
@@ -88,6 +104,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float ForwardValue = 0.f;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	PushState CurrentPushState = PushState::NotPushing;
 
 
 
@@ -158,19 +176,66 @@ protected:
 		if (!bIsPushing || ItemToPush == nullptr)
 			return;
 
-		GetCharacterMovement()->bOrientRotationToMovement = false;
+		// If player gets too farh from item, stop pushing
+
+		FVector Distance = GetActorLocation() - ItemToPush->GetActorLocation();
+		float DistSize = Distance.Size();
+
+		if(DistSize > 200.f)
+		{
+			SetPushValue(false);
+			return;
+		}
+
 
 		if (ForwardValue == 0)
+		{
+			CurrentPushState = PushState::NotPushing;
 			return;
+
+		}
 		
 		if(ForwardValue > 0.1f)
-			ItemToPush->MoveItem(34.f, GetActorForwardVector());
+		{
+			ItemToPush->MoveItem(PushSpeed, GetActorForwardVector());
+			CurrentPushState = PushState::Pushing;
+		}
+			
 		else
 		{
-			ItemToPush->MoveItem(-34.f, GetActorForwardVector());
+			ItemToPush->MoveItem(-PushSpeed, GetActorForwardVector());
+			CurrentPushState = PushState::Pulling;
 		}
 
 	}
+
+	UFUNCTION(BlueprintCallable)
+	void SetPushValue(bool bPush)
+	{
+		bIsPushing = bPush;
+
+		if (bIsPushing)
+		{
+			ItemToPush = GetClosestItem();
+			GetCharacterMovement()->bOrientRotationToMovement = false;
+			GetCharacterMovement()->MaxWalkSpeed = PushWalkSpeed;
+		}
+
+		if (!bIsPushing)
+		{
+			ItemToPush = nullptr;
+			GetCharacterMovement()->bOrientRotationToMovement = true;
+			GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+			CurrentPushState = PushState::NotPushing;
+		}
+	}
+
+	UFUNCTION(BlueprintCallable)
+	int GetPushState() const
+	{
+		return static_cast<int>(CurrentPushState);
+	}
+
 
 	UFUNCTION(BlueprintCallable)
 	AItem* GetClosestItem() const

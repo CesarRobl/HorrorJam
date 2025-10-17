@@ -20,8 +20,8 @@ class HORRORJAM_API UUPuzzleConditionNode : public UDataAsset
 		FName ManagerID;
 
 		UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Puzzle Condition")
-		bool EvaluateCondition(const UObject* Context) const;
-		virtual bool EvaluateCondition_Implementation(const UObject* Context) const {return false; }
+		bool EvaluateCondition(const UObject* Context, int Index) const;
+		virtual bool EvaluateCondition_Implementation(const UObject* Context, int Index) const {return false; }
 
 	
 };

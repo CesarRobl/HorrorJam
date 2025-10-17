@@ -6,22 +6,18 @@
 #include "UPuzzleConditionNode.h"
 #include "PuzzleManager.h"
 #include "EngineUtils.h"
-#include "UPlateWeightCondition.generated.h"
+#include "PedestalItemCondition.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
-class HORRORJAM_API UUPlateWeightCondition : public UUPuzzleConditionNode
+class HORRORJAM_API UPedestalItemCondition : public UUPuzzleConditionNode
 {
 	GENERATED_BODY()
-	
+
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float RequiredWeight;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 PlateIndex = 0;
+	FString RequiredItem;
 
 	bool EvaluateCondition_Implementation(const UObject* Context, int Index) const override
 	{
@@ -33,15 +29,24 @@ public:
 			return false;
 
 		APuzzleManager* PuzzleManager = nullptr;
-
 		PuzzleManager = GetPuzzleManager(Context);
-		
+
 		if(!PuzzleManager)
 			return false;
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Plate %d has weight: %d (Required: %f)"), Index, PuzzleManager->PuzzleSignals[Index] ? PuzzleManager->PuzzleSignals[Index]->Weight : 0, RequiredWeight));
+		APuzzleSignal* PuzzleSignal = PuzzleManager->PuzzleSignals[Index];
 
-		return PuzzleManager->PuzzleSignals[Index]->Weight >= RequiredWeight;
+		if(!PuzzleSignal || !PuzzleSignal->PedestalItem)
+			return false;
+
+		AItem* PedestalItem = PuzzleSignal->PedestalItem;
+
+		if(!PedestalItem)
+			return false;
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Pedestal has: %s"), PedestalItem ? *PedestalItem->ItemName : TEXT("Nothing")));
+
+		return PedestalItem->ItemName == RequiredItem;
 	}
 
 	APuzzleManager* GetPuzzleManager(const UObject* Context) const
@@ -54,10 +59,14 @@ public:
 		for (TActorIterator<APuzzleManager> It(World); It; ++It)
 		{
 
-			if(It->PuzzleID == ManagerID)
+			if (It->PuzzleID == ManagerID)
+			{
+				
 				return *It;
+			}
+			
 		}
+
 		return nullptr;
 	}
-
 };

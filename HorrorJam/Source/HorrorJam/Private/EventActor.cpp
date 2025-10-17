@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PuzzleManager.h"
+#include "EventActor.h"
 
 // Sets default values
-APuzzleManager::APuzzleManager()
+AEventActor::AEventActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -12,23 +12,14 @@ APuzzleManager::APuzzleManager()
 }
 
 // Called when the game starts or when spawned
-void APuzzleManager::BeginPlay()
+void AEventActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// Initialize PuzzleStates based on the number of conditions
-	if (PuzzleRule)
-	{
-		PuzzleStates.SetNum(PuzzleRule->Conditions.Num());
-		for (int i = 0; i < PuzzleStates.Num(); i++)
-		{
-			PuzzleStates[i] = false;
-		}
-	}
 }
 
 // Called every frame
-void APuzzleManager::Tick(float DeltaTime)
+void AEventActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
