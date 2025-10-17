@@ -15,6 +15,12 @@ public:
 	// Sets default values for this actor's properties
 	AEventActor();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bEventIsFinished = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bEventIsActive = false;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

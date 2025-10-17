@@ -74,11 +74,13 @@ public:
 			// Puzzle completed
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Puzzle %s Completed!"), *PuzzleID.ToString()));
 			
-			for (auto& Event : PuzzleEvents)
-			{
-				if (Event)
-					Event->TriggerEvent();
-			}
+
+			if(PuzzleEvents.Num() > 0)
+				for (auto& Event : PuzzleEvents)
+				{
+					if (Event)
+						Event->TriggerEvent();
+				}
 		}
 		else
 		{
